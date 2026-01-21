@@ -24,7 +24,7 @@ const config = defineConfig({
     envDir: resolve(".."),
     envPrefix: "PUBLIC_",
     server: {
-        port: Number(new URL(process.env.PUBLIC_DEV_ORIGIN).port) || 3000,
+        port: Number(new URL(process.env.PUBLIC_DEV_ORIGIN.split(",")[0]).port) || 3000,
         proxy: process.env.PUBLIC_ORIGIN ? {
             "/api": { target: process.env.PUBLIC_ORIGIN },
             "/auth": { target: process.env.PUBLIC_ORIGIN }

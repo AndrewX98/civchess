@@ -29,7 +29,7 @@ function createAuth(database: mongo.Db) {
     return betterAuth({
         baseURL: `${process.env.PUBLIC_ORIGIN}/auth`,
         trustedOrigins: process.env.PUBLIC_DEV_ORIGIN
-            ? [process.env.PUBLIC_DEV_ORIGIN] : [],
+            ? process.env.PUBLIC_DEV_ORIGIN.split(",") : [],
         secret: process.env.AUTH_SECRET,
         database: mongodbAdapter(database),
         emailAndPassword: { enabled: process.env.NODE_ENV == "development" },

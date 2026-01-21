@@ -21,15 +21,16 @@ function SignIn() {
     }
 
     async function debugSignIn() {
+        const randomSuffix = Math.random().toString(36).substring(2, 8);
         const details = {
             avatarColour: "#ffffff",
             avatarPiece: "wK",
             callbackURL: "/lobby",
-            email: "testing@wintrchess.com",
-            name: "testing",
+            email: `testing${randomSuffix}@wintrchess.com`,
+            name: `testing${randomSuffix}`,
             password: "testingtesting",
             roles: []
-        } as const satisfies Parameters<typeof authClient.signUp.email>[0];
+        } satisfies Parameters<typeof authClient.signUp.email>[0];
 
         const registration = await authClient.signUp.email(details);
 

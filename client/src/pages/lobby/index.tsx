@@ -28,6 +28,8 @@ import styles from "./index.module.css";
 function Lobby() {
     useProtectedRoute();
 
+    const [ worldCode, setWorldCode ] = useState<string>("");
+
     const statusSocket = useMemo(() => io(
         new URL("/world-status", import.meta.env.PUBLIC_ORIGIN).href,
         { path: "/api/socket", transports: ["websocket"] }
@@ -125,9 +127,23 @@ function Lobby() {
             <Divider label="JOIN WORLD" w="100%"/>
 
             <Group w="100%" gap="10px" justify="center">
-                <TextInput size="md" placeholder="World Code..." w="250px"/>
+                <TextInput
+                    size="md"
+                    placeholder="World Code..."
+                    w="250px"
+                    value={worldCode}
+                    onChange={(e) => setWorldCode(e.currentTarget.value)}
+                />
 
-                <Button size="md" color="var(--ui-shade-5)">
+                <Button
+                    size="md"
+                    color="var(--ui-shade-5)"
+                    onClick={() => {
+                        if (worldCode.trim()) {
+                            location.href = `/play/${worldCode.trim()}`;
+                        }
+                    }}
+                >
                     Join World
                 </Button>
             </Group>

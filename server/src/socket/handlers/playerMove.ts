@@ -84,12 +84,20 @@ export const playerMoveHandler = createPacketHandler({
             id.worldCode, fromChunkX, fromChunkY
         );
 
+        const toChunkRoom = chunkSubscriptionRoom(
+            id.worldCode, chunkX, chunkY
+        );
+
         const movement: PieceMovePacket = {
             fromX: player.x,
             fromY: player.y,
             toX: packet.x,
             toY: packet.y
         };
+
+        const moveBroadcaster = socket.broadcast
+            .to(fromChunkRoom)
+            .to(toChunkRoom);
 
         // Deal damage and reject move if moving to other player's square
         const toRuntimeSquare = await getSquare(
@@ -110,9 +118,9 @@ export const playerMoveHandler = createPacketHandler({
 
             if (newHealth > 0) {
                 await playerUpdate.exec();
-                
+
                 sendPacket("pieceMove", { ...movement, attack: true },
-                    socket.broadcast.to(fromChunkRoom)
+                    moveBroadcaster
                 );
 
                 return acknowledge({
@@ -142,9 +150,7 @@ export const playerMoveHandler = createPacketHandler({
         "runtime");
 
         // Broadcast move packet to chunk subscribers
-        sendPacket("pieceMove", movement,
-            socket.broadcast.to(fromChunkRoom)
-        );
+        sendPacket("pieceMove", movement, moveBroadcaster);
 
         // Broadcast to those where the player is entering their view
         sendPacket("worldChunkUpdate", {
@@ -157,7 +163,7 @@ export const playerMoveHandler = createPacketHandler({
             }
         }, getChunkBroadcaster(
             socket, id.worldCode, chunkX, chunkY
-        ).except(fromChunkRoom));
+        ).except(fromChunkRoom).except(toChunkRoom));
 
         // Diff chunks and load new ones, discarding old ones
         if (fromChunkX != chunkX || fromChunkY != chunkY) {
